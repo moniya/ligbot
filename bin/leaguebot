@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby -w
+
+require "fileutils"
+include FileUtils
+
+if ARGV.empty?
+  abort <<-EOF
+
+  Usage: supalig [command] [flags]
+  commands: new
+
+EOF
+end
+
+case ARGV[0]
+when "new"
+  ARGV.shift
+  app_dir = ARGV.shift
+  mkdir app_dir
+  chdir app_dir
+  mkdir "data"
+end
