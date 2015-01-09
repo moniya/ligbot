@@ -4,9 +4,9 @@ class Fixtures
     @fixtures_file_path = fixtures_file_path
   end
 
-  def setup fixtures_arr
-    @fixtures_arr = fixtures_arr
-    File.write @fixtures_file_path, @fixtures_arr.map { |r| r.join(',')}.join("\n")
+  def setup teams
+    fixtures_arr = FixtureGenerator.run teams.split("\n")
+    File.write @fixtures_file_path, fixtures_arr.map { |r| r.join(',')}.join("\n")
   end
 
   def all
@@ -25,4 +25,33 @@ class Fixtures
   def current_round
      @db.misc.current_round
   end
+
+  module FixtureGenerator
+    module_function
+
+    def run(teams)
+      [].tap{ |result|
+        teams = Array teams
+        no_of_iter = teams.length - 1
+
+        no_of_iter.times do
+          result << cohere(teams)
+          rotate_tail(teams)
+        end
+      }
+    end
+
+    def rotate_tail(arr)
+      first = arr.shift
+      arr.rotate!(-1).unshift first
+    end
+
+    def cohere(arr)
+      arr_dup = arr.dup
+      [].tap { |res|
+        res << [arr_dup.shift, arr_dup.pop].join(':') while arr_dup.any?
+      }
+    end
+  end
+
 end

@@ -3,7 +3,8 @@ class Misc
     @misc_file_path = misc_file_path
   end
 
-  def setup total_rounds
+  def setup teams
+    total_rounds = teams.length * (teams.length-1)
     File.write @misc_file_path, <<-EOS
 current_round:1
 total_rounds:#{total_rounds}

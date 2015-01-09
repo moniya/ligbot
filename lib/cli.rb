@@ -1,14 +1,21 @@
 module Ligbot
   class CLI
-    class Creator
-      def run db
-        teams = ARGF.read
-        fixtures = FixtureGenerator.run teams.split("\n")
-        db.setup teams, fixtures
-      end
 
-    end
     def run argv
+      options = process_args argv
+      db = CsvDb.new options[:name]
+
+      if options[:create]
+        League.new.create db
+      elsif options[:restart]
+        League.new.restart db
+      else
+        # Catch file no exist as no league error
+        GamePlay.new.run db
+      end
+    end
+
+    def process_args argv
       argv.unshift "-h" if argv.empty?
       options = {}
       argv.options do |opts|
@@ -18,7 +25,11 @@ module Ligbot
         opts.separator "Options:"
 
         opts.on("-c", "--create", "Create league.") do |name|
-          options[:create] = name
+          options[:create] = true
+        end
+
+        opts.on("-r", "--restart", "Restart league.") do |name|
+          options[:restart] = true
         end
 
         opts.on( "-h", "--help",
@@ -34,15 +45,16 @@ module Ligbot
           exit
         end
       end
-      name = argv.shift
-      db = CsvDb.new name
+      options[:name] = argv.shift
+      options
+    end
 
-      if options[:create]
-        Creator.new.run db
-      else
-        # Catch file no exist as no league error
-        GamePlay.new.run db
+    class League
+      def create db
+        teams = ARGF.read
+        db.setup teams
       end
+
     end
   end
 end

@@ -1,6 +1,6 @@
 Fixture = Struct.new(:team1, :team2) do
   def play
-    Match.new(team1, team2, gen_goals, gen_goals)
+    Match.new team1, team2, gen_goals, gen_goals
   end
 
   def gen_goals
