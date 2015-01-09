@@ -12,4 +12,8 @@ class Matches
 
     File.open(@matches_file_path, "a") { |f| f.puts str }
   end
+
+  def delete_all
+    File.write @matches_file_path, ''
+  end
 end

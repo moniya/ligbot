@@ -55,6 +55,9 @@ module Ligbot
         db.setup teams
       end
 
+      def restart db
+        db.restart_league
+      end
     end
   end
 end

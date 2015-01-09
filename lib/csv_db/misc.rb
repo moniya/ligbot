@@ -4,7 +4,8 @@ class Misc
   end
 
   def setup teams
-    total_rounds = teams.length * (teams.length-1)
+    team_arr = teams.split /\n/
+    total_rounds = team_arr.length/4 * (team_arr.length-1)
     File.write @misc_file_path, <<-EOS
 current_round:1
 total_rounds:#{total_rounds}
@@ -28,5 +29,10 @@ EOS
     r += 1
     arr.assoc("current_round")[1] = r.to_s
     File.write @misc_file_path,  arr.map{ |x| x.join(":")}.join("\n")
+  end
+
+  def restart_rounds
+    str = File.read @misc_file_path
+    File.write @misc_file_path, str.gsub(/current_round.+/, "current_round:1")
   end
 end
