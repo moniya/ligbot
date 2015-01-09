@@ -1,21 +1,42 @@
 require "fileutils"
+require "lib/csv_db/fixtures"
+require "lib/csv_db/matches"
+require "lib/csv_db/misc"
+require "lib/csv_db/teams"
+
 include FileUtils
 
 class CsvDb
-  def setup league_name, teams, fixtures
-    db_dir = File.expand_path "~/.ligbot"
+  attr_reader :matches, :teams, :fixtures, :misc
 
-    mkdir db_dir unless Dir.exists? db_dir
-    chdir db_dir
-    if Dir.exists? league_name
-      abort "League #{league_name} already exists."
+  def initialize(league_name)
+    @league_name = league_name
+    @db_dir = File.expand_path "~/.ligbot"
+    @league_dir = File.join @db_dir, @league_name
+
+    @matches = Matches.new(File.join(@league_dir, "matches.txt"))
+    @teams = Teams.new(File.join(@league_dir, "teams.txt"))
+    @fixtures = Fixtures.new(self, File.join(@league_dir, "fixtures.txt"))
+    @misc = Misc.new(File.join @league_dir, "misc.txt")
+
+  end
+
+  def setup teams, fixtures_arr
+    mkdir @db_dir unless Dir.exists? @db_dir
+    chdir @db_dir
+    if Dir.exists? @league_name
+      abort "League @league_name already exists."
     else
-      mkdir league_name
+      mkdir @league_name
     end
-    chdir File.expand_path(File.join db_dir, league_name)
-    touch "matches.txt"
-    File.write "teams.txt", teams
-    File.write "fixtures.txt", fixtures.map { |r| r.join(',')}.join("\n")
-    File.write "misc.txt", "current_round : 0"
+    @matches.setup
+    @teams.setup teams
+    @fixtures.setup fixtures_arr
+    @misc.setup fixtures_arr.length
+  end
+
+  def bump_round
+    @misc.bump_round
   end
 end
+

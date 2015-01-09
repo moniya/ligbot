@@ -1,15 +1,14 @@
 module Ligbot
   class CLI
     class Creator
-      def run name, db
-        name = name
+      def run db
         teams = ARGF.read
         fixtures = FixtureGenerator.run teams.split("\n")
-        db.setup name, teams, fixtures
+        db.setup teams, fixtures
       end
 
     end
-    def main argv
+    def run argv
       argv.unshift "-h" if argv.empty?
       options = {}
       argv.options do |opts|
@@ -36,12 +35,13 @@ module Ligbot
         end
       end
       name = argv.shift
-      if options[:create]
-        db = CsvDb.new
+      db = CsvDb.new name
 
-        Creator.new.run name, db
+      if options[:create]
+        Creator.new.run db
       else
-        GamePlay.new.run name, db
+        # Catch file no exist as no league error
+        GamePlay.new.run db
       end
     end
   end

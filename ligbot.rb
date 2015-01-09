@@ -1,4 +1,7 @@
 require "optparse"
 require "lib/cli"
 require "lib/csv_db"
+require "lib/fixture"
 require "lib/fixture_generator"
+require "lib/gameplay"
+require "lib/match"
